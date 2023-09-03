@@ -15,6 +15,9 @@ public class ConfigService {
     private String webhookUrl;
     private String guildId;
     private Boolean printServerEvents;
+    private Boolean printDeathEvents;
+    private Boolean printLoginEvents;
+    private Boolean printAdvancementEvents;
 
     private ConfigService() {
         File config = new File("discord.properties");
@@ -24,6 +27,8 @@ public class ConfigService {
                 prop.setProperty("discord.webhook", "<url-goes-here>");
                 prop.setProperty("discord.guild", "797899107124510731");
                 prop.setProperty("printServerEvents", "false");
+                prop.setProperty("printDeathEvents", "false");
+                prop.setProperty("printLoginEvents", "false");
                 prop.store(output, "ForgeLink configuration file");
             } catch (IOException e) {
                 LOGGER.error("Failed to generate the configuration file");
@@ -35,6 +40,8 @@ public class ConfigService {
             this.webhookUrl = prop.getProperty("discord.webhook");
             this.guildId = prop.getProperty("discord.guild");
             this.printServerEvents = prop.getProperty("printServerEvents").equals("true");
+            this.printDeathEvents = prop.getProperty("printDeathEvents").equals("true");
+            this.printLoginEvents = prop.getProperty("printLoginEvents").equals("true");
         } catch (IOException e) {
             LOGGER.error("Failed to read properties");
             LOGGER.error(e.getMessage(), e);

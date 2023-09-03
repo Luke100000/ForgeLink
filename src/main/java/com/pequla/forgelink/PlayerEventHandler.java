@@ -2,6 +2,7 @@ package com.pequla.forgelink;
 
 import com.pequla.forgelink.dto.DataModel;
 import com.pequla.forgelink.dto.WebhookModel;
+import com.pequla.forgelink.utils.ConfigService;
 import com.pequla.forgelink.utils.TextComponent;
 import com.pequla.forgelink.utils.WebService;
 import net.minecraft.server.MinecraftServer;
@@ -31,7 +32,9 @@ public class PlayerEventHandler {
             WebService client = WebService.getInstance();
             DataModel model = client.getPlayerData(player.getStringUUID());
             playerData.put(player.getStringUUID(), model);
-            sendPlayerWebhook(player, playerCountFormatter(player, true));
+            if (ConfigService.getInstance().getPrintLoginEvents()) {
+                sendPlayerWebhook(player, playerCountFormatter(player, true));
+            }
             LOGGER.info(player.getName() + " joined as " + model.getNickname() + " (ID: " + model.getId() + ")");
         } catch (Exception e) {
             LOGGER.error(player.getName() + " login was rejected: " + e.getMessage(), e);
@@ -42,19 +45,21 @@ public class PlayerEventHandler {
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        Player player = event.getEntity();
-        if (playerData.containsKey(player.getStringUUID())) {
-            LOGGER.info("Dispatching leave message");
-            sendPlayerWebhook(player, playerCountFormatter(player, false));
-            playerData.remove(player.getStringUUID());
+        if (ConfigService.getInstance().getPrintLoginEvents()) {
+            Player player = event.getEntity();
+            if (playerData.containsKey(player.getStringUUID())) {
+                LOGGER.info("Dispatching leave message");
+                sendPlayerWebhook(player, playerCountFormatter(player, false));
+                playerData.remove(player.getStringUUID());
+            }
         }
     }
 
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof Player player) {
-            if (playerData.containsKey(player.getStringUUID())) {
+        if (ConfigService.getInstance().getPrintDeathEvents()) {
+            Entity entity = event.getEntity();
+            if (entity instanceof Player player && (playerData.containsKey(player.getStringUUID()))) {
                 LOGGER.info("Dispatching death message");
                 String msg = event.getSource().getLocalizedDeathMessage(event.getEntity()).getString();
                 sendPlayerWebhook(player, msg.replace(player.getName().getString() + " ", ""));
@@ -64,16 +69,18 @@ public class PlayerEventHandler {
 
     @SubscribeEvent
     public void onAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
-        Player player = event.getEntity();
-        if (playerData.containsKey(player.getStringUUID())) {
-            MinecraftServer server = event.getEntity().getServer();
-            if (server != null && server.getPlayerList().getPlayerAdvancements((ServerPlayer) event.getEntity()).getOrStartProgress(event.getAdvancement()).isDone()) {
-                if (event.getAdvancement() != null && event.getAdvancement().getDisplay() != null && event.getAdvancement().getDisplay().shouldAnnounceChat()) {
-                    String title = event.getAdvancement().getDisplay().getTitle().getString();
-                    String desc = event.getAdvancement().getDisplay().getDescription().getString();
-                    LOGGER.info("Dispatching advancement message");
-                    sendPlayerWebhook(player, "just made the advancement **" + title + "**"
-                            + System.lineSeparator() + "*" + desc + "*");
+        if (ConfigService.getInstance().getPrintAdvancementEvents()) {
+            Player player = event.getEntity();
+            if (playerData.containsKey(player.getStringUUID())) {
+                MinecraftServer server = event.getEntity().getServer();
+                if (server != null && server.getPlayerList().getPlayerAdvancements((ServerPlayer) event.getEntity()).getOrStartProgress(event.getAdvancement()).isDone()) {
+                    if (event.getAdvancement() != null && event.getAdvancement().getDisplay() != null && event.getAdvancement().getDisplay().shouldAnnounceChat()) {
+                        String title = event.getAdvancement().getDisplay().getTitle().getString();
+                        String desc = event.getAdvancement().getDisplay().getDescription().getString();
+                        LOGGER.info("Dispatching advancement message");
+                        sendPlayerWebhook(player, "just made the advancement **" + title + "**"
+                                + System.lineSeparator() + "*" + desc + "*");
+                    }
                 }
             }
         }
