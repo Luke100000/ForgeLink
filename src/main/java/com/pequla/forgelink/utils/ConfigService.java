@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.Properties;
 
 @Getter
@@ -40,10 +41,10 @@ public class ConfigService {
             prop.load(input);
             this.webhookUrl = prop.getProperty("discord.webhook");
             this.guildId = prop.getProperty("discord.guild");
-            this.printServerEvents = prop.getProperty("printServerEvents").equals("true");
-            this.printDeathEvents = prop.getProperty("printDeathEvents").equals("true");
-            this.printLoginEvents = prop.getProperty("printLoginEvents").equals("true");
-            this.printAdvancementEvents = prop.getProperty("printAdvancementEvents").equals("true");
+            this.printServerEvents = Objects.equals(prop.getProperty("printServerEvents"), "true");
+            this.printDeathEvents = Objects.equals(prop.getProperty("printDeathEvents"), "true");
+            this.printLoginEvents = Objects.equals(prop.getProperty("printLoginEvents"), "true");
+            this.printAdvancementEvents = Objects.equals(prop.getProperty("printAdvancementEvents"), "true");
         } catch (IOException e) {
             LOGGER.error("Failed to read properties");
             LOGGER.error(e.getMessage(), e);
