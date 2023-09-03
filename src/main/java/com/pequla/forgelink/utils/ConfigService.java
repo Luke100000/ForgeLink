@@ -29,6 +29,7 @@ public class ConfigService {
                 prop.setProperty("printServerEvents", "false");
                 prop.setProperty("printDeathEvents", "false");
                 prop.setProperty("printLoginEvents", "false");
+                prop.setProperty("printAdvancementEvents", "false");
                 prop.store(output, "ForgeLink configuration file");
             } catch (IOException e) {
                 LOGGER.error("Failed to generate the configuration file");
@@ -42,6 +43,7 @@ public class ConfigService {
             this.printServerEvents = prop.getProperty("printServerEvents").equals("true");
             this.printDeathEvents = prop.getProperty("printDeathEvents").equals("true");
             this.printLoginEvents = prop.getProperty("printLoginEvents").equals("true");
+            this.printAdvancementEvents = prop.getProperty("printAdvancementEvents").equals("true");
         } catch (IOException e) {
             LOGGER.error("Failed to read properties");
             LOGGER.error(e.getMessage(), e);
