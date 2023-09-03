@@ -1,6 +1,7 @@
 package com.pequla.forgelink;
 
 import com.pequla.forgelink.dto.WebhookModel;
+import com.pequla.forgelink.utils.ConfigService;
 import com.pequla.forgelink.utils.WebService;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -24,12 +25,16 @@ public class ForgeLink {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
-        sendSystemWebhook("Server started");
+        if (ConfigService.getInstance().getPrintServerEvents()) {
+            sendSystemWebhook("Server started");
+        }
     }
 
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
         // Do something when the server stops
-        sendSystemWebhook("Server stopped");
+        if (ConfigService.getInstance().getPrintServerEvents()) {
+            sendSystemWebhook("Server stopped");
+        }
     }
 }
