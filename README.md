@@ -1,3 +1,5 @@
+# Replaced by [ArchLink](https://github.com/Luke100000/ArchLink)
+
 # ForgeLink
 Advanced Discord based whitelisting server side mod for Forge 1.19.2
 
